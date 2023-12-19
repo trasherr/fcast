@@ -1,0 +1,50 @@
+<div style="margin-top: 5%; justify-content: center; align-items: center;">
+    <button class="btn btn-primary" (click)="AddEntity()">Add Entity</button>
+    &nbsp;
+    <button class="btn btn-success" (click)="openDialog()">Add Colums</button>
+
+</div>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th *ngFor="let col of ListOfColums">{{ col.columnName }}</th>
+    </tr>
+  </thead>
+  <!-- Add your table body here with actual data -->
+  
+</table>
+
+
+<div *ngFor="let i of getNumberRange(NumberOfEntity)">
+      <div>
+        <table class="table table-bordered">
+        
+          <tbody>
+            <tr *ngFor="let j of getNumberRange(NumberOfRowInEntity[i]); let rowIndex = index">
+              <td *ngFor="let col of ListOfColums; let k = index">
+                <input class="form-control" [type]="col.dataType" placeholder="Enter the {{i + rowIndex + k}}" [(ngModel)]="Data[i][rowIndex][k]['value']" />
+              </td>
+            </tr>
+            
+            <tr>
+              
+                <button class="btn btn-primary" (click)="AddRow(i)">Add Row</button>
+                <!-- Add more cells as needed -->
+            </tr>
+            <tr>
+            <th *ngFor="let col of ListOfColums">Total</th>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+     
+   
+  </div>
+
+
+  <div>
+    <button *ngIf="NumberOfEntity" class="btn btn-success w-100 " (click)="SaveData()">Save Data</button>
+  </div>
+  

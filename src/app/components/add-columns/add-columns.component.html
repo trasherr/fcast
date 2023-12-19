@@ -1,0 +1,22 @@
+<h2 class="dialog-title">Add Column</h2>
+<div class="modal-body">
+  <form [formGroup]="columnForm">
+    <div class="form-group">
+      <mat-label for="columnName">Column Name</mat-label>
+      <input type="text" class="form-control" id="columnName" placeholder="Column Name" formControlName="columnName" required>
+    </div>
+
+    <div class="form-group">
+      <mat-label for="dataType">Data Type</mat-label>
+      <mat-select class="form-control" id="dataType" placeholder="Select Data Type" formControlName="dataType" required>
+        <mat-option value="number">Number</mat-option>
+        <mat-option value="string">Text</mat-option>
+        <mat-option value="boolean">Boolean</mat-option>
+      </mat-select>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onSaveClick()">Save</button>
+</div>
