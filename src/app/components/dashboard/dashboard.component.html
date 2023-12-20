@@ -16,32 +16,65 @@
 </table>
 
 
-<div *ngFor="let i of getNumberRange(NumberOfEntity)">
-      <div>
-        <table class="table table-bordered">
-        
-          <tbody>
-            <tr *ngFor="let j of getNumberRange(NumberOfRowInEntity[i]); let rowIndex = index">
-              <td *ngFor="let col of ListOfColums; let k = index">
-                <input class="form-control" [type]="col.dataType" placeholder="Enter the {{i + rowIndex + k}}" [(ngModel)]="Data[i][rowIndex][k]['value']" />
-              </td>
-            </tr>
-            
-            <tr>
-              
-                <button class="btn btn-primary" (click)="AddRow(i)">Add Row</button>
-                <!-- Add more cells as needed -->
-            </tr>
-            <tr>
-            <th *ngFor="let col of ListOfColums">Total</th>
-          </tr>
-          </tbody>
-        </table>
-      </div>
 
-     
-   
+<div *ngFor="let i of getNumberRange(NumberOfEntity); let a=index">
+  <div>
+    <table class="table table-bordered">
+      <tbody>
+        <tr *ngFor="let j of getNumberRange(NumberOfRowInEntity[i]); let b=index">
+          <td *ngFor="let col of ListOfColums; let k = index">
+            <input
+  class="form-control"
+  [type]="col.dataType"
+  [id]="'id' + i + 'rowas' + j + 'columns' + k"
+  placeholder="Enter the {{ col.columnName }}"
+  [(ngModel)]="Data[a][b][k].value"
+/>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button class="btn btn-primary" (click)="AddRow(i)">Add Row</button>
+          </td>
+        </tr>
+       <!-- Assuming this is inside a table row -->
+<tr>
+  <td *ngFor="let col of ListOfColums; let k = index">
+    Total: 
+    <input
+      class="form-control"
+      [type]="col.dataType"
+      
+      placeholder="Enter the {{ col.columnName }}"
+      [(ngModel)]="Total[a][k].value"
+    />
+  </td>
+</tr>
+
+      </tbody>
+    </table>
   </div>
+</div>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th *ngFor="let col of ListOfColums;let k=index">Grand Total:- <input
+        class="form-control"
+        [type]="col.dataType"
+       
+        placeholder="Enter the {{ col.columnName }}"
+        [(ngModel)]="GrandTotal[k]['value']"
+      
+      />
+      </th>
+    </tr>
+  </thead>
+  <!-- Add your table body here with actual data -->
+  
+</table>
 
 
   <div>

@@ -14,6 +14,8 @@ export class DashboardComponent implements OnInit {
    ListOfColums:any[]=[];
    NumberOfRowInEntity:number[]=[0];
    Data:any[]=[[]];
+   GrandTotal:any[]=[];
+   Total:any=[];
 
    constructor(public dialog: MatDialog, private columnService: DashboardService) {}
 
@@ -25,7 +27,14 @@ export class DashboardComponent implements OnInit {
   AddEntity()
   {
     this.NumberOfEntity++;
-   
+
+    this.Total.push(this.ListOfColums);
+   if(this.NumberOfEntity===1)
+    this.GrandTotal=this.ListOfColums;
+
+    console.log("Total",this.Total);
+    console.log("Grand",this.GrandTotal);
+
    
   }
   
@@ -40,6 +49,7 @@ export class DashboardComponent implements OnInit {
         console.log("i am result",result);
         this.ListOfColums.push(result);
         this.columnService.addColumn(`${result.name} (${result.type} ${result.value})`);
+        this.GrandTotal=this.ListOfColums;
         console.log(this.ListOfColums);
       }
     });
@@ -69,5 +79,7 @@ this.Data[rowId]=[this.ListOfColums];
   SaveData()
   {
     console.log(this.Data);
+    console.log(this.GrandTotal);
+    console.log(this.Total);
   }
 }
