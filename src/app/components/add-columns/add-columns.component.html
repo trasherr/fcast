@@ -1,22 +1,35 @@
-<h2 class="dialog-title">Add Column</h2>
-<div class="modal-body">
-  <form [formGroup]="columnForm">
-    <div class="form-group">
-      <mat-label for="columnName">Column Name</mat-label>
-      <input type="text" class="form-control" id="columnName" placeholder="Column Name" formControlName="columnName" required>
-    </div>
+<!-- Add Column Dialog -->
+<div class="card">
+  <div class="card-header bg-light">
+    <h2 class="dialog-title mb-0" style="text-align: center;">Add Column</h2>
+    <button type="button" class="close" aria-label="Close" (click)="onNoClick()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
 
-    <div class="form-group">
-      <mat-label for="dataType">Data Type</mat-label>
-      <mat-select class="form-control" id="dataType" placeholder="Select Data Type" formControlName="dataType" required>
-        <mat-option value="number">Number</mat-option>
-        <mat-option value="string">Text</mat-option>
-        <mat-option value="boolean">Boolean</mat-option>
-      </mat-select>
-    </div>
-  </form>
-</div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="onNoClick()">Cancel</button>
-  <button mat-button (click)="onSaveClick()">Save</button>
+  <div class="card-body">
+    <form [formGroup]="columnForm">
+      <div class="form-group">
+        <label for="columnName">Column Name</label>
+        <input type="text" class="form-control" id="columnName" placeholder="Enter Column Name" formControlName="columnName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dataType">Data Type</label>
+        <mat-select class="form-control" id="dataType" placeholder="Select Data Type" formControlName="dataType" required>
+          <mat-option value="number">Number</mat-option>
+          <mat-option value="string">Text</mat-option>
+          <mat-option value="boolean">Boolean</mat-option>
+        </mat-select>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-footer d-flex justify-content-between">
+    <button type="button" class="btn btn-success fab-btn" (click)="onSaveClick()">
+      <i class="material-icons">check</i> Save
+    </button>
+    <div style="width: 10px;"></div> <!-- Adjust the gap between buttons as needed -->
+    <button type="button" class="btn btn-danger" (click)="onNoClick()">Cancel</button>
+  </div>
 </div>

@@ -11,9 +11,10 @@ import { MatDialog } from '@angular/material/dialog';
 export class DashboardComponent implements OnInit {
 
   NumberOfEntity: number = 0;
-  ListOfColums: any[] = [];
-  NumberOfRowInEntity: number[] = [0];
-  Data: any[] = [[]];
+  ListOfColumns: any[] = [];
+  EntityTotal: any[] = [];
+  NumberOfRowInEntity: any[] = [[]];
+  Data: any[] = [[[]]];
   GrandTotal: any[] = [];
   Total: any[] = [];
 
@@ -23,35 +24,45 @@ export class DashboardComponent implements OnInit {
 
   AddEntity() {
     this.NumberOfEntity++;
-   
-    
-     
+
     if (this.NumberOfEntity === 1) {
-      this.GrandTotal = this.ListOfColums;
-      this.Total = [this.ListOfColums.map(col => ({value: 0,columnName:col.columnName }))];
+      this.GrandTotal = this.ListOfColumns;
+      this.EntityTotal = [this.ListOfColumns.map(col => ({ value: 0, columnName: col.columnName }))];
+    } else {
+      const newRow = this.ListOfColumns.map(col => ({ value: 0, columnName: col.columnName }));
+      this.EntityTotal.push(newRow);
     }
-    else
-    {
-      const newRow = this.ListOfColums.map(col => ({ value: 0,columnName:col.columnName }));
-      
-      this.Total.push(newRow);
-    }
-  
+
+    this.NumberOfRowInEntity[this.NumberOfEntity - 1] = [];
   }
+
+  AddTable(EntityIndex: any) {
+    console.log(EntityIndex);
+    this.NumberOfRowInEntity[EntityIndex].push(0);
+    console.log("es", this.NumberOfRowInEntity);
+  
+    if (this.Total[EntityIndex] === undefined) {
+      this.Total[EntityIndex] = [this.ListOfColumns.map(col => ({ value: 0, columnName: col.columnName }))];
+    } else {
+      const newRow = this.ListOfColumns.map(col => ({ value: 0, columnName: col.columnName }));
+      this.Total[EntityIndex].push(newRow);
+    }
+  }
+  
 
   openDialog(): void {
     const dialogRef = this.dialog.open(AddColumnsComponent, {
-      width: '250px',
+      width: '50%',
       data: { name: '', type: '' },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         console.log("i am result", result);
-        this.ListOfColums.push(result);
+        this.ListOfColumns.push(result);
         this.columnService.addColumn(`${result.name} (${result.type} ${result.value})`);
-        this.GrandTotal = this.ListOfColums;
-        console.log(this.ListOfColums);
+        this.GrandTotal = this.ListOfColumns;
+        console.log(this.ListOfColumns);
       }
     });
   }
@@ -60,76 +71,90 @@ export class DashboardComponent implements OnInit {
     return Array.from({ length: number }, (_, i) => i);
   }
 
-  AddRow(rowId: any) {
-    console.log("row", rowId);
-    if (!isNaN(this.NumberOfRowInEntity[rowId])) {
-      this.NumberOfRowInEntity[rowId]++;
-      // Create a new array for each row
-      const newRow = this.ListOfColums.map(col => ({ value: '' }));
-      this.Data[rowId].push(newRow);
-    } else {
-      this.NumberOfRowInEntity[rowId] = 1;
-      // Create a new array for the first row
-      this.Data[rowId] = [this.ListOfColums.map(col => ({ value: '' }))];
+  AddRow(EntityId: any, TableIndex: number, rowId: any) {
+    console.log("Number of row in entity", this.NumberOfRowInEntity);
+    console.log("row", rowId, "TableIndex", TableIndex);
+
+    if (!Array.isArray(this.NumberOfRowInEntity[EntityId])) {
+      this.NumberOfRowInEntity[EntityId] = [];
     }
-  
+
+    if (this.NumberOfRowInEntity[EntityId][TableIndex] !== undefined) {
+      this.NumberOfRowInEntity[EntityId][TableIndex]++;
+
+      if (!Array.isArray(this.Data[EntityId])) {
+        this.Data[EntityId] = [];
+      }
+
+      if (!Array.isArray(this.Data[EntityId][TableIndex])) {
+        this.Data[EntityId][TableIndex] = [];
+      }
+
+      const newRow = this.ListOfColumns.map(col => ({ value: '' }));
+      this.Data[EntityId][TableIndex].push(newRow);
+    } else {
+      this.NumberOfRowInEntity[EntityId][TableIndex] = 1;
+
+      if (!Array.isArray(this.Data[EntityId])) {
+        this.Data[EntityId] = [];
+      }
+
+      this.Data[EntityId][TableIndex] = [this.ListOfColumns.map(col => ({ value: '' }))];
+    }
+
     console.log("Data", this.Data);
     console.log(this.NumberOfRowInEntity);
   }
-  
+
   SaveData() {
     console.log(this.Data);
     console.log(this.GrandTotal);
-    console.log(this.Total);
+    console.log("Total",this.Total);
+
+    console.log("Entity Total", this.EntityTotal);
   }
 
-  onDataChange(newValue: any, entityIndex: number, rowIndex: number, colIndex: number): void {
+  onTotalChangeToEntityTotal(newValue: any, entityIndex: number, colIndex: number): void {
+
+    let sum = 0;
+    for (let i = 0; i < this.Total[entityIndex].length; i++) {
+      sum += Number(this.Total[entityIndex][i][colIndex].value);
+    }
+    this.EntityTotal[entityIndex][colIndex].value = sum;
+
+    this.onTotalChangeGrandChange(0, 0, colIndex);
+  }
+
+  onEntityTotalChange(newValue: any, entityIndex: number, rowIndex: number, colIndex: number): void {
+    if (rowIndex === -1) {
+      this.EntityTotal[entityIndex][colIndex].value = newValue;
+      this.onTotalChangeGrandChange(0, 0, colIndex);
+    }
+  }
+
+  onDataChange(newValue: any, entityIndex: number, TableIndex: number, rowIndex: number, colIndex: number): void {
     if (!this.Data[entityIndex]) {
       this.Data[entityIndex] = [];
     }
-    if (!this.Data[entityIndex][rowIndex]) {
-      this.Data[entityIndex][rowIndex] = [];
+    if (!this.Data[entityIndex][TableIndex][rowIndex]) {
+      this.Data[entityIndex][TableIndex][rowIndex] = [];
     }
-    if (!this.Data[entityIndex][rowIndex][colIndex]) {
-      this.Data[entityIndex][rowIndex][colIndex] = {};
+    if (!this.Data[entityIndex][TableIndex][rowIndex][colIndex]) {
+      this.Data[entityIndex][TableIndex][rowIndex][colIndex] = {};
     }
-    
-    this.Data[entityIndex][rowIndex][colIndex].value = newValue;
-    this.onDataChangeReflectChangeToTotal(0, entityIndex, -1, colIndex);
+    this.Data[entityIndex][TableIndex][rowIndex][colIndex].value = newValue;
+    this.onDataChangeReflectChangeToTotal(0, entityIndex, TableIndex, -1, colIndex);
   }
 
-  onDataChangeReflectChangeToTotal(newValue: any, entityIndex: number, rowIndex: number, colIndex: number): void {
+  onDataChangeReflectChangeToTotal(newValue: any, entityIndex: number, TableIndex: number, rowIndex: number, colIndex: number): void {
     if (rowIndex === -1) {
-        let sum = 0;
-        for (let i = 0; i < this.NumberOfRowInEntity[entityIndex]; i++) {
-          sum += Number(this.Data[entityIndex][i][colIndex].value);
-
-        }
-        this.Total[entityIndex][colIndex].value = sum;
-        this.onTotalChangeGrandChange(0, -1, colIndex)
+      let sum = 0;
+      for (let i = 0; i < this.NumberOfRowInEntity[entityIndex][TableIndex]; i++) {
+        sum += Number(this.Data[entityIndex][TableIndex][i][colIndex].value);
+      }
+      this.Total[entityIndex][TableIndex][colIndex].value = sum;
+      this.onTotalChangeToEntityTotal(0, entityIndex, colIndex);
     } else {
-        // This is a regular data row
-        if (!this.Data[entityIndex]) {
-            this.Data[entityIndex] = [];
-        }
-        if (!this.Data[entityIndex][rowIndex]) {
-            this.Data[entityIndex][rowIndex] = [];
-        }
-        if (!this.Data[entityIndex][rowIndex][colIndex]) {
-            this.Data[entityIndex][rowIndex][colIndex] = {};
-        }
-
-        this.Data[entityIndex][rowIndex][colIndex].value = newValue;
-    }
-}
-
-  onTotalChange(newValue: any, entityIndex: number, rowIndex: number, colIndex: number): void {
-    if (rowIndex === -1) {
-      // This is the Total row
-      this.Total[entityIndex][colIndex].value = newValue;
-      this.onTotalChangeGrandChange(0, -1, colIndex)
-    } else {
-      // This is a regular data row
       if (!this.Data[entityIndex]) {
         this.Data[entityIndex] = [];
       }
@@ -139,27 +164,45 @@ export class DashboardComponent implements OnInit {
       if (!this.Data[entityIndex][rowIndex][colIndex]) {
         this.Data[entityIndex][rowIndex][colIndex] = {};
       }
-
       this.Data[entityIndex][rowIndex][colIndex].value = newValue;
+    }
+  }
+
+  onTotalChange(newValue: any, entityIndex: number, TableIndex: number, rowIndex: number, colIndex: number): void {
+    if (rowIndex === -1) {
+      this.Total[entityIndex][TableIndex][colIndex]['value'] = newValue;
+      this.onTotalChangeToEntityTotal(0, entityIndex, colIndex);
+    } else {
+      if (!this.Data[entityIndex]) {
+        this.Data[entityIndex][TableIndex] = [];
+      }
+      if (!this.Data[entityIndex][TableIndex][rowIndex]) {
+        this.Data[entityIndex][TableIndex][rowIndex] = [];
+      }
+      if (!this.Data[entityIndex][TableIndex][rowIndex][colIndex]) {
+        this.Data[entityIndex][TableIndex][rowIndex][colIndex] = {};
+      }
+      this.Data[entityIndex][TableIndex][rowIndex][colIndex].value = newValue;
+      this.onTotalChangeToEntityTotal(0,entityIndex,colIndex);
     }
   }
 
   onGrandChange(newValue: any, rowIndex: number, colIndex: number): void {
     if (rowIndex === -1) {
-    
       this.GrandTotal[colIndex].value = newValue;
     }
   }
 
   onTotalChangeGrandChange(newValue: any, rowIndex: number, colIndex: number): void {
-    if (rowIndex === -1) {
-        let sum = 0;
-        for (let i = 0; i < this.NumberOfEntity; i++) {
-            sum += Number(this.Total[i][colIndex].value);
-        }
-        this.GrandTotal[colIndex].value = sum;
-    }
-}
+   
+      let sum = 0;
+      for (let i = 0; i < this.EntityTotal.length; i++) {
+        console.log("yes");
+        sum += Number(this.EntityTotal[i][colIndex].value);
+      }
+      this.GrandTotal[colIndex].value = sum;
+    
+  }
 
   getGrandTotalValue(index: number): any {
     return this.GrandTotal[index]?.value;

@@ -1,61 +1,100 @@
-<div style="margin-top: 5%; justify-content: center; align-items: center;">
-  <button class="btn btn-primary" (click)="AddEntity()">Add Entity</button>
-  &nbsp;
-  <button class="btn btn-success" (click)="openDialog()">Add Columns</button>
+<div style="margin-top: 5%; text-align: center;">
+  <button class="btn btn-primary" (click)="AddEntity()">
+    <i class="fas fa-plus"></i> Add Entity
+</button>
+
+&nbsp;
+
+<button class="btn btn-success" (click)="openDialog()">
+    <i class="fas fa-check"></i> Add Columns
+</button>
+
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered table-striped table-hover">
   <thead>
     <tr>
-      <th *ngFor="let col of ListOfColums">{{ col.columnName }}</th>
+      <th *ngFor="let col of ListOfColumns">{{ col.columnName }}</th>
     </tr>
   </thead>
 </table>
-
 <div *ngFor="let i of getNumberRange(NumberOfEntity); let a=index">
   <div>
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <span>Entity {{ i }}</span>
+      <button class="btn btn-primary" (click)="AddTable(a)">Add Table</button>
+    </div>
+    <div *ngFor="let m of getNumberRange(NumberOfRowInEntity[i].length); let n=index">
+      <table class="table table-bordered">
+        <tbody>
+          <tr *ngFor="let j of getNumberRange(NumberOfRowInEntity[a][n]); let b=index">
+            <td *ngFor="let col of ListOfColumns; let k = index">
+              <input
+                class="form-control"
+                [type]="col.dataType"
+                [id]="'id' + i + 'rowas' + j + 'columns' + k"
+                placeholder="Enter the {{ col.columnName }}"
+                [ngModel]="Data[a][n][b][k]?.value"
+                (ngModelChange)="onDataChange($event, a, n, b, k)"
+               
+              />
+            </td>
+          </tr>
+  
+          <tr>
+            <td>
+              <button class="btn btn-primary fab-btn" (click)="AddRow(i, n,NumberOfRowInEntity[i][n])">
+                <i class="fas fa-plus"></i> Add Row
+              </button>
+              
+            </td>
+          </tr>
+  
+          <tr>
+            <td *ngFor="let col of ListOfColumns; let k = index">
+              Table Total:
+              <input
+                class="form-control"
+                [type]="col.dataType"
+                placeholder="Enter the {{ col.columnName }}"
+                [ngModel]="Total[a][n][k]?.value"
+                (ngModelChange)="onTotalChange($event, a, n, -1, k)"
+
+                
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+
+
+    </div>
     <table class="table table-bordered">
-      <tbody>
-        <tr *ngFor="let j of getNumberRange(NumberOfRowInEntity[i]); let b=index">
-          <td *ngFor="let col of ListOfColums; let k = index">
-            <input
-              class="form-control"
-              [type]="col.dataType"
-              [id]="'id' + i + 'rowas' + j + 'columns' + k"
-              placeholder="Enter the {{ col.columnName }}"
-              [ngModel]="Data[a][b][k]?.value"
-              (ngModelChange)="onDataChange($event, a, b, k)"
-            />
-          </td>
-        </tr>
-
+      <thead>
         <tr>
-          <td>
-            <button class="btn btn-primary" (click)="AddRow(i)">Add Row</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td *ngFor="let col of ListOfColums; let k = index">
-            Total:
+          <th *ngFor="let col of ListOfColumns; let k=index">
+            Entity Total: -
             <input
               class="form-control"
               [type]="col.dataType"
               placeholder="Enter the {{ col.columnName }}"
-              [ngModel]="Total[a][k]?.value"
-              (ngModelChange)="onTotalChange($event, a, -1, k)"
+              [ngModel]="EntityTotal[i][k]?.value"
+              (ngModelChange)="onEntityTotalChange($event, i, -1, k)"
             />
-          </td>
+          </th>
         </tr>
-      </tbody>
+      </thead>
     </table>
+  
+    
   </div>
 </div>
 
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th *ngFor="let col of ListOfColums; let k=index">
+      <th *ngFor="let col of ListOfColumns; let k=index">
         Grand Total: -
         <input
           class="form-control"
@@ -69,6 +108,8 @@
   </thead>
 </table>
 
-<div>
-  <button class="btn btn-success w-100" (click)="SaveData()">Save Data</button>
+<div class="text-center mt-4">
+  <button class="btn btn-success btn-lg w-50" (click)="SaveData()">
+    <i class="fas fa-save"></i> Save Data
+  </button>
 </div>
